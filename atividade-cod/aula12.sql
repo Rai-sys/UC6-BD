@@ -90,3 +90,37 @@ VALUES
 (1, 1, '350.00', '2023-06-15', 'transferencia bancaria'), (2, 2, '450.00', '2023-07-15', 'cartão de crédito'),
 (3, 3, '600.00', '2023-08-10', 'cartão de crédito'), (4, 4, '300.00', '2023-09-25', 'transferencia bancaria');
 SELECT * FROM Pagamentos;
+
+-- 4. LISTE O NOME E E-MAIL DE TODOS OS CLIENTES CADASTRADOS
+SELECT nome, email FROM Clientes;
+
+-- 5. RECUPERE OS NOMES DOS SERVIÇOS DISPONÍVEIS E SEUS RESPECTIVOS PREÇOS.
+SELECT nome, preco FROM Servicos;
+
+-- 6. EXIBA OS NOMES E ESPECIALIDADES DE TODOS OS TÉCNICOS.
+SELECT nome, especialidade FROM Tecnicos;
+
+-- 7. MOSTRE A DESCRIÇÃO E O STATUS DE TODOS OS CHAMADOS REGISTRADOS.
+SELECT descricao, status FROM Chamados;
+
+-- 8. LISTE OS VALORES PAGOS E AS DATAS DE PAGAMENTO DE TODOS OS REGISTROS NA TABELA DE PAGAMENTOS.
+SELECT valor_pago, data_pagamento FROM Pagamentos;
+
+-- 9. LISTE OS NOMES DOS CLIENTES E AS DESCRIÇÕES DE SEUS CHAMADOS QUE ESTÃO COM O STATUS "EM ANDAMENTO".
+SELECT Clientes.nome, Chamados.descricao
+FROM Clientes JOIN Chamados
+ON Clientes.id = Chamados.cliente_id
+WHERE Chamados.status = 'em andamento';
+
+-- 10. RECUPERE OS NOMES DOS TÉCNICOS QUE REALIZARAM SERVIÇOS COM O TIPO "MANUTENÇÃO"
+SELECT Tecnicos.nome, Servicos.tipo_servico
+FROM Tecnicos JOIN Servicos
+ON Servicos.id = Tecnicos.id
+WHERE tipo_servico = 'manutencao';
+
+-- 11. MOSTRE OS NOMES DOS CLIENTES E O VALOR TOTAL PAGO POR CADA UM DELES.
+SELECT Clientes.nome, Pagamentos.valor_pago
+FROM Clientes JOIN Pagamentos
+ON Pagamentos.id = Clientes.id
+
+-- 12. LISTE OS CLIENTES E OS SERVIÇOS QUE ELES SOLICITARAM, INCLUINDO A DESCRIÇÃO DO SERVIÇO.
