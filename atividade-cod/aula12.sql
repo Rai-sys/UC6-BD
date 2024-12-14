@@ -121,6 +121,21 @@ WHERE tipo_servico = 'manutencao';
 -- 11. MOSTRE OS NOMES DOS CLIENTES E O VALOR TOTAL PAGO POR CADA UM DELES.
 SELECT Clientes.nome, Pagamentos.valor_pago
 FROM Clientes JOIN Pagamentos
-ON Pagamentos.id = Clientes.id
+ON Pagamentos.id = Clientes.id;
 
 -- 12. LISTE OS CLIENTES E OS SERVIÇOS QUE ELES SOLICITARAM, INCLUINDO A DESCRIÇÃO DO SERVIÇO.
+
+-- 13. RECUPERE OS NOMES DOS TÉCNICOS QUE REALIZARAM CHAMADOS PARA SERVIÇOS COM O PREÇO SUPERIOR A 400, E EXIBA TAMBÉM O NOME DO SERVIÇO.
+SELECT Tecnicos.nome, Servicos.nome, Servicos.preco
+FROM Tecnicos JOIN Servicos
+ON Tecnicos.id = Servicos.id
+WHERE preco > 400;
+
+-- 14. ATUALIZE O PREÇO DE TODOS OS SERVIÇOS DO TIPO "MANUTENÇÃO" PARA 350, SE O PREÇO ATUAL FOR INFERIOR A 350.
+UPDATE Servicos 
+SET preco = 350
+WHERE tipo_servico = 'manutencao' AND preco < 350;
+
+-- 15. EXCLUA TODOS OS TÉCNICOS QUE NÃO TÊM CHAMADOS REGISTRADOS.
+DELETE FROM Tecnicos
+WHERE id NOT IN (SELECT DISTINCT tecnico_id FROM Chamados);
