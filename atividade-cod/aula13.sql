@@ -69,3 +69,32 @@ SELECT * FROM autor;
 SELECT * FROM livro;
 SELECT * FROM usuario;
 SELECT * FROM emprestimo;
+
+-- LISTANDO NOME E LIVRO DOS AUTORES
+SELECT autor.nome, livro.titulo
+FROM autor JOIN livro
+ON livro.id_autor = autor.id;
+
+-- LISTANDO OS USUARIOS E SEUS EMAILS
+SELECT usuario.nome, usuario.email
+FROM usuario;
+
+-- LISTANDO EMPRESTIMOS REALIZADOS, INFORMAÇÃO DO LIVRO, DO USUARIO E DA DATA
+SELECT usuario.nome, livro.titulo, emprestimo.data_emprestimo, emprestimo.data_devolucao
+FROM emprestimo
+JOIN livro ON id_livro = livro.id
+JOIN usuario ON id_usuario = usuario.id;
+
+-- LISTANDO LIVROS QUE NAO FORAM DEVOLVIDOS
+SELECT livro.titulo, emprestimo.data_devolucao
+FROM emprestimo
+JOIN livro ON id_livro = livro.id
+WHERE data_devolucao = null;
+
+-- QUESTÃO 18
+SELECT usuario.nome, livro.titulo
+FROM emprestimo
+JOIN livro ON id_livro = livro.id
+JOIN usuario ON id_usuario = usuario.id
+JOIN autor ON id_autor = autor.id
+WHERE autor.nome = 'Clarice Lispector';
