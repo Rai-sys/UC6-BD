@@ -103,3 +103,15 @@ SELECT * FROM venda;
 SELECT * FROM item_venda;
 
 rollback;
+
+-- QUESTAO 01
+SELECT cliente.nome, COUNT(venda.id_cliente) AS total_vendas
+FROM venda JOIN cliente ON venda.id = cliente.id
+GROUP BY cliente.nome
+ORDER BY cliente.nome ASC;
+
+-- QUESTAO 02
+SELECT funcionario.nome , COUNT(venda.id_funcionario) AS total_vendas_funcionarios
+FROM venda JOIN funcionario ON venda.id_funcionario = funcionario.id
+GROUP BY funcionario.nome
+ORDER BY funcionario.nome ASC;
