@@ -1,5 +1,5 @@
 begin;
--- CRIANDO TABELA CLIENTE
+-- CRIANDO TABELA CLIENTE ------------
 CREATE TABLE cliente (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(60) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE cliente (
   data_cadastro DATE DEFAULT CURRENT_DATE
 );
 
--- CRIANDO TABELA PRODUTO
+-- CRIANDO TABELA PRODUTO ------------
 CREATE TABLE produto (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(30) NOT NULL,
@@ -21,7 +21,18 @@ CREATE TABLE produto (
   CONSTRAINT chk_estoque_quantidade CHECK (NOT estoque_quantidade < 0)
 );
 
--- CRIANDO TABELA FUNCIONARIO
+-- criando coluna 'categoria'
+ALTER TABLE produto ADD COLUMN categoria VARCHAR(50);
+
+-- adicionando produto 1, 2, 4, para categoria 'eletronico'
+UPDATE produto SET categoria = 'eletronico'
+WHERE id IN (1,2,4);
+-- adicionando produto 3, 5, para categoria 'gaming'
+UPDATE produto SET categoria = 'gaming'
+WHERE id IN (3,5);
+
+
+-- CRIANDO TABELA FUNCIONARIO ---------------
 CREATE TABLE funcionario (
   id SERIAL PRIMARY KEY,
   nome VARCHAR(60) NOT NULL,
@@ -33,7 +44,7 @@ CREATE TABLE funcionario (
   CONSTRAINT chk_salario CHECK (NOT salario < 0)
 );
 
--- CRIANDO TABELA VENDA
+-- CRIANDO TABELA VENDA ---------------------
 CREATE TABLE venda (
   id SERIAL PRIMARY KEY,
   data_venda DATE DEFAULT CURRENT_DATE,
@@ -45,7 +56,7 @@ CREATE TABLE venda (
   CONSTRAINT fk_funcionario FOREIGN KEY (id_funcionario) REFERENCES funcionario(id) ON DELETE CASCADE
 );
 
--- CRIANDO TABELA ITEM VENDA
+-- CRIANDO TABELA ITEM VENDA -----------------
 CREATE TABLE item_venda (
   id SERIAL PRIMARY KEY,
   id_venda SERIAL,
@@ -154,8 +165,6 @@ HAVING SUM (item_venda.quantidade_item) > 0
 ORDER BY total_produto DESC;
 
 -- 9. Calcule o valor total das vendas de cada cliente.
-select * from venda;
-
 SELECT cliente.nome, SUM (venda.total_venda) AS total_venda
 FROM venda
 JOIN cliente ON cliente.id = venda.id_cliente
@@ -163,22 +172,119 @@ GROUP BY cliente.nome
 ORDER BY cliente.nome DESC;
 
 -- 10.Calcule o valor total das vendas realizadas por cada funcionário.
+SELECT funcionario.nome, SUM (total_venda) AS total_vendas
+FROM venda
+JOIN funcionario ON funcionario.id = venda.id_funcionario
+GROUP BY funcionario.nome
+ORDER BY total_vendas;
+
 -- 11.Calcule o total de itens vendidos por venda.
+SELECT id_venda, SUM (quantidade_item) AS total_item_vendido
+FROM item_venda
+GROUP BY id_venda
+ORDER BY total_item_vendido;
+
 -- 12.Calcule o total de produtos vendidos agrupados por categoria (se
 -- adicionarmos uma coluna de categoria na tabela de produtos).
+SELECT produto.categoria, SUM(item_venda.quantidade_item) AS total_vendido
+FROM item_venda
+JOIN produto ON item_venda.id_produto = produto.id
+GROUP BY produto.categoria;
+
 -- 13.Calcule o total arrecadado com vendas para cada cliente.
+SELECT cliente.nome, SUM (total_venda) AS total_arrecadado
+FROM venda
+JOIN cliente ON venda.id_cliente = cliente.id
+GROUP BY cliente.nome
+ORDER BY total_arrecadado;
+
 -- 14.Calcule o preço médio dos produtos em estoque.
+select * from produto;
+
+SELECT estoque_quantidade, round(AVG (preco), 2) AS preco_medio
+FROM produto
+GROUP BY estoque_quantidade
+ORDER BY preco_medio;
+
 -- 15.Calcule o preço médio dos produtos vendidos por venda.
+SELECT id, round(AVG(total_venda),2) AS media
+FROM venda
+GROUP BY id
+ORDER BY media;
+
 -- 16.Calcule a média de salários dos funcionários.
+SELECT nome, AVG (salario) AS media_salarial
+FROM funcionario
+GROUP BY nome
+ORDER BY nome ASC;
+
 -- 17.Calcule a média do total das vendas por funcionário.
+SELECT funcionario.nome, AVG (total_venda) AS media_venda_total
+FROM venda
+JOIN funcionario ON venda.id_funcionario = funcionario.id
+GROUP BY funcionario.nome
+ORDER BY funcionario.nome ASC;
+
 -- 18.Conte quantas vendas foram realizadas por cliente.
+SELECT cliente.nome, COUNT (total_venda) AS total_vendas
+FROM venda
+JOIN cliente ON venda.id_cliente = cliente.id
+GROUP BY cliente.nome
+ORDER BY cliente.nome ASC;
+
 -- 19.Conte quantas vendas cada funcionário participou.
+select * from venda;
+SELECT funcionario.nome, COUNT (total_venda) AS participacao_vendas
+FROM venda
+JOIN funcionario ON venda.id_funcionario = funcionario.id
+GROUP BY funcionario.nome
+ORDER BY funcionario.nome ASC;
+
 -- 20.Conte quantos produtos estão cadastrados no banco.
+select * from produto;
+SELECT nome, COUNT (estoque_quantidade) AS cadastrados
+FROM produto
+GROUP BY nome
+ORDER BY cadastrados;
+
 -- 21.Conte quantas vendas foram realizadas em cada dia.
+SELECT data_venda, COUNT (*) AS vendas_no_dia
+FROM venda
+GROUP BY data_venda
+ORDER BY vendas_no_dia ASC;
+
 -- 22.Liste os clientes que realizaram mais de 5 compras, ordenados pelo
 -- total de vendas.
+SELECT cliente.nome, COUNT (venda.id) AS total_vendas
+FROM venda 
+JOIN cliente ON venda.id_cliente = cliente.id
+GROUP BY cliente.nome
+HAVING COUNT (venda.id) > 0   --nao tem mais de 5 compras 
+ORDER BY total_vendas;
+
 -- 23.Liste os produtos mais vendidos (em quantidade) cujo total vendido
 -- ultrapassa 50 unidades.
+SELECT produto.nome, SUM (item_venda.quantidade_item) AS quantidade
+FROM item_venda
+JOIN produto ON item_venda.id_produto = produto.id
+GROUP BY produto.nome
+HAVING SUM (item_venda.quantidade_item) > 1 --não tem mais de 50
+ORDER BY quantidade ASC;
+
 -- 24.Calcule a média de preço dos produtos vendidos em cada venda.
+select * from item_venda;
+SELECT produto.nome, round(AVG (preco_unitario), 2) AS preco_medio
+FROM item_venda
+JOIN produto ON item_venda.id_produto = produto.id
+GROUP BY produto.nome
+ORDER BY preco_medio
+
 -- 25.Liste os funcionários que participaram de vendas cujo total médio é
 -- superior a R$ 5.000,00.
+select * from venda;
+SELECT funcionario.nome, round(AVG (total_venda), 2) AS total_medio
+FROM venda
+JOIN funcionario ON venda.id_funcionario = funcionario.id
+GROUP BY funcionario.nome
+HAVING AVG (total_venda) > 4000.00 --apenas mais de 4.000
+ORDER BY total_medio
